@@ -2,7 +2,7 @@
 
 Sistema automatizado de atendimento e pedidos de marmitas utilizando **n8n**, **Groq AI** e interface web moderna.
 
-![Workflow n8n](./takeaway.png)
+![Workflow n8n](./workflow.png)
 
 ---
 
