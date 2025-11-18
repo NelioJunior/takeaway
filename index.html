@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://nelljunior.app.n8n.cloud; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
+    <title>Quentinha Takeaway - Faça seu Pedido</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px;
+            height: 700px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .pedido-confirmado {
+            background: #4caf50 !important;
+            color: white !important;
+            font-weight: 500;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 18px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* Scrollbar personalizada */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🍱 Quentinha Takeaway</h1>
+            <p>Faça seu pedido de marmita!</p>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-bubble">
+                    Olá! Bem-vindo à Quentinha Takeaway! 😊<br><br>
+                    Como posso ajudar você hoje? Digite "cardápio" para ver nossas opções!
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input 
+                    type="text" 
+                    id="chatInput" 
+                    class="chat-input" 
+                    placeholder="Digite sua mensagem..."
+                    autocomplete="off"
+                >
+                <button id="sendButton" class="send-button">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração
+        const WEBHOOK_URL = 'https://nelljunior.app.n8n.cloud/webhook/order';
+        
+        // Gera ou recupera sessionId único
+        let sessionId = localStorage.getItem('marmitaria_sessionId');
+        if (!sessionId) {
+            sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('marmitaria_sessionId', sessionId);
+        }
+
+        // Elementos DOM
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Adiciona mensagem ao chat
+        function addMessage(text, isUser = false, isConfirmed = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            if (isConfirmed) {
+                bubbleDiv.classList.add('pedido-confirmado');
+            }
+            bubbleDiv.textContent = text;
+            
+            messageDiv.appendChild(bubbleDiv);
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll para o final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Mostra indicador de digitação
+        function showTyping(show = true) {
+            typingIndicator.classList.toggle('active', show);
+            if (show) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        // Envia mensagem para o backend
+        async function sendMessage() {
+            const mensagem = chatInput.value.trim();
+            
+            if (!mensagem) return;
+            
+            // Adiciona mensagem do usuário
+            addMessage(mensagem, true);
+            chatInput.value = '';
+            
+            // Desabilita input enquanto processa
+            chatInput.disabled = true;
+            sendButton.disabled = true;
+            showTyping(true);
+            
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        mensagem: mensagem,
+                        sessionId: sessionId
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                showTyping(false);
+                
+                // Verifica se é um array e pega o primeiro item
+                const resposta = Array.isArray(data) ? data[0] : data;
+                
+                // Adiciona resposta do bot
+                if (resposta.mensagem) {
+                    const isPedidoConfirmado = resposta.status === 'confirmado';
+                    addMessage(resposta.mensagem, false, isPedidoConfirmado);
+                    
+                    // Se pedido confirmado, mostra detalhes
+                    if (isPedidoConfirmado && resposta.itens && resposta.itens.length > 0) {
+                        setTimeout(() => {
+                            const detalhes = `
+📋 Pedido #${resposta.id}
+🍱 Itens: ${resposta.itens.join(', ')}
+${resposta.personalizacoes.length > 0 ? '✏️ Personalizações: ' + resposta.personalizacoes.join(', ') : ''}
+💰 Valor Total: R$ ${resposta.valor_total.toFixed(2)}
+                            `.trim();
+                            addMessage(detalhes, false, true);
+                        }, 500);
+                    }
+                } else {
+                    addMessage('Desculpe, não consegui processar sua mensagem.', false);
+                }
+                
+            } catch (error) {
+                showTyping(false);
+                console.error('Erro:', error);
+                addMessage('❌ Erro ao enviar mensagem. Tente novamente.', false);
+            } finally {
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.focus();
+            }
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Focus no input ao carregar
+        chatInput.focus();
+
+        // Botão para limpar conversa (opcional)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                if (confirm('Deseja iniciar uma nova conversa?')) {
+                    sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('marmitaria_sessionId', sessionId);
+                    chatMessages.innerHTML = '';
+                    addMessage('Olá! Bem-vindo à Quentinha Takeaway! 😊\n\nComo posso ajudar você hoje? Digite "cardápio" para ver nossas opções!', false);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
