@@ -315,7 +315,7 @@ Este projeto é open source e está disponível sob a [MIT License](LICENSE).
 ## 📞 Suporte
 
 Para dúvidas ou problemas:
-1. Abra uma [Issue](https://github.com/nelljunior/takeaway/issues)
+1. Abra uma [Issue](https://github.com/NelioJunior/takeaway/issues)
 2. Consulte a [Documentação do n8n](https://docs.n8n.io)
 3. Veja os logs de execução no n8n
 
