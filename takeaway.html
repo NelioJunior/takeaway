@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://nelljunior.app.n8n.cloud; style-src 'unsafe-inline'; script-src 'unsafe-inline';">
     <title>Quentinha Takeaway - Faça seu Pedido</title>
+   
+    
     <style>
         * {
             margin: 0;
@@ -267,25 +270,26 @@
             </div>
         </div>
     </div>
+ <script>
 
-    <script>
-        // Configuração
-        const WEBHOOK_URL = 'https://nelljunior.app.n8n.cloud/webhook/order';
-        
-        // Gera ou recupera sessionId único
-        let sessionId = localStorage.getItem('marmitaria_sessionId');
-        if (!sessionId) {
-            sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('marmitaria_sessionId', sessionId);
-        }
-
-        // Elementos DOM
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendButton = document.getElementById('sendButton');
-        const typingIndicator = document.getElementById('typingIndicator');
-
-        // Adiciona mensagem ao chat
+    const WEBHOOK_URL = 'https://nelljunior.app.n8n.cloud/webhook/order';
+    
+    // Gera ou recupera sessionId único
+    let sessionId = localStorage.getItem('marmitaria_sessionId');
+    if (!sessionId) {
+        sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('marmitaria_sessionId', sessionId);
+    }
+    
+    // Elementos DOM
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const sendButton = document.getElementById('sendButton');
+    const typingIndicator = document.getElementById('typingIndicator');
+    
+    window.addEventListener('load', () => {
+    
+        // Adiciona message ao chat
         function addMessage(text, isUser = false, isConfirmed = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
@@ -303,7 +307,7 @@
             // Scroll para o final
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-
+        
         // Mostra indicador de digitação
         function showTyping(show = true) {
             typingIndicator.classList.toggle('active', show);
@@ -311,15 +315,15 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
-
-        // Envia mensagem para o backend
+        
+        // Envia message para o backend
         async function sendMessage() {
-            const mensagem = chatInput.value.trim();
+            const message = chatInput.value.trim();
             
-            if (!mensagem) return;
+            if (!message) return;
             
-            // Adiciona mensagem do usuário
-            addMessage(mensagem, true);
+            // Adiciona message do usuário
+            addMessage(message, true);
             chatInput.value = '';
             
             // Desabilita input enquanto processa
@@ -334,7 +338,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        mensagem: mensagem,
+                        message: message,
                         sessionId: sessionId
                     })
                 });
@@ -349,20 +353,22 @@
                 
                 // Verifica se é um array e pega o primeiro item
                 const resposta = Array.isArray(data) ? data[0] : data;
+
+                const msg = (resposta.Message || resposta.message || "");
                 
                 // Adiciona resposta do bot
-                if (resposta.mensagem) {
-                    const isPedidoConfirmado = resposta.status === 'confirmado';
-                    addMessage(resposta.mensagem, false, isPedidoConfirmado);
+                if (msg) {
+                    const isPedidoConfirmado = resposta.status == "confirmado";
+                    addMessage(msg, false, isPedidoConfirmado);
                     
                     // Se pedido confirmado, mostra detalhes
                     if (isPedidoConfirmado && resposta.itens && resposta.itens.length > 0) {
                         setTimeout(() => {
                             const detalhes = `
-📋 Pedido #${resposta.id}
-🍱 Itens: ${resposta.itens.join(', ')}
-${resposta.personalizacoes.length > 0 ? '✏️ Personalizações: ' + resposta.personalizacoes.join(', ') : ''}
-💰 Valor Total: R$ ${resposta.valor_total.toFixed(2)}
+                                  📋 Pedido #${resposta.id}
+                                  🍱 Itens: ${resposta.itens.join(', ')}
+                                  ${resposta.personalizacoes.length > 0 ? '✏️ Personalizações: ' + resposta.personalizacoes.join(', ') : ''}
+                                  💰 Valor Total: R$ ${resposta.valor_total.toFixed(2)}
                             `.trim();
                             addMessage(detalhes, false, true);
                         }, 500);
@@ -381,7 +387,7 @@ ${resposta.personalizacoes.length > 0 ? '✏️ Personalizações: ' + resposta.
                 chatInput.focus();
             }
         }
-
+        
         // Event listeners
         sendButton.addEventListener('click', sendMessage);
         
@@ -390,10 +396,10 @@ ${resposta.personalizacoes.length > 0 ? '✏️ Personalizações: ' + resposta.
                 sendMessage();
             }
         });
-
+        
         // Focus no input ao carregar
         chatInput.focus();
-
+        
         // Botão para limpar conversa (opcional)
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'l') {
@@ -405,7 +411,9 @@ ${resposta.personalizacoes.length > 0 ? '✏️ Personalizações: ' + resposta.
                     addMessage('Olá! Bem-vindo à Quentinha Takeaway! 😊\n\nComo posso ajudar você hoje? Digite "cardápio" para ver nossas opções!', false);
                 }
             }
-        });
-    </script>
+        });            
+    })
+     
+ </script>   
 </body>
 </html>
