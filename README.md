@@ -253,7 +253,7 @@ curl -X POST "https://nelljunior.app.n8n.cloud/webhook/order" \
 ```
 takeaway/
 │
-├── index.html              # Frontend do chat
+├── takeaway.html           # Frontend do chat
 ├── takeaway.png            # Screenshot do workflow n8n
 ├── README.md               # Este arquivo
 │
@@ -307,17 +307,8 @@ Este projeto é open source e está disponível sob a [MIT License](LICENSE).
 ## 👥 Autor
 
 **Nell Junior**
-- GitHub: [@nelljunior](https://github.com/nelljunior)
+- Linkedin: https://www.linkedin.com/in/nelio-junior-python/
 - Projeto: [Takeaway](https://github.com/nelljunior/takeaway)
-
----
-
-## 🙏 Agradecimentos
-
-- [n8n](https://n8n.io) - Plataforma de automação
-- [Groq](https://groq.com) - Inferência de IA ultrarrápida
-- [Google Sheets](https://sheets.google.com) - Armazenamento de dados
-- Comunidade open source
 
 ---
 
